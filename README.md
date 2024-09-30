@@ -12,7 +12,7 @@ Theorem boxes are created using `thmboxes_v3.sty`. They are inspired by
 [Example file](example.tex)
 
 ## How to use
-Import using
+Download from Releases, or just download the file from the repo. Then import using
 
 ```
 \usepackage[framemethod=TikZ]{mdframed}
