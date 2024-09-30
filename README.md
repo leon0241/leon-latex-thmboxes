@@ -33,6 +33,8 @@ Where:
 - `Reference Number` is a custom text if filled. Does not have to be numeric
     - If not filled, the number follows an automatic scheme on `\subsubsection` level
 
+:coffee: [(Optional) Buy me a coffee :)](https://ko-fi.com/leon024)
+
 ## Custom Theorem Boxes
 
 ### Generic Template
