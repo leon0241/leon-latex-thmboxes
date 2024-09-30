@@ -7,6 +7,8 @@ Theorem boxes are created using `thmboxes_v3.sty`. They are inspired by
 
 **NOTE**: don't use thmboxes_v4, it's WIP and doesn't really work right now
 
+:coffee: [(Optional) Buy me a coffee :)](https://ko-fi.com/leon024)
+
 ## Example:
 ![](thmboxes_example.png)
 [Example file](example.tex)
@@ -32,8 +34,6 @@ Where:
 - `Label` is for cross-document hyperlinking
 - `Reference Number` is a custom text if filled. Does not have to be numeric
     - If not filled, the number follows an automatic scheme on `\subsubsection` level
-
-:coffee: [(Optional) Buy me a coffee :)](https://ko-fi.com/leon024)
 
 ## Custom Theorem Boxes
 
