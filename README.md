@@ -10,6 +10,8 @@ Theorem boxes are created using `thmboxes_v3.sty`. They are inspired by
 :coffee: [(Optional) Buy me a coffee :)](https://ko-fi.com/leon024)
 
 ## Example:
+
+**See my exam notes for IRL Examples!** [leon-latex-notes](https://github.com/leon0241/leon-latex-notes)
 ![](thmboxes_example.png)
 [Example file](example.tex)
 
