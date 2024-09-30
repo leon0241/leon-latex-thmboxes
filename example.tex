@@ -1,40 +1,68 @@
-\documentclass{article}
+\documentclass[]{article}
 
 \usepackage[framemethod=TikZ]{mdframed}
 \usepackage{thmboxes_v3}
-
+\usepackage{lipsum}
+\usepackage{multicol}
 
 \title{Theorem Boxes}
 \author{Leon Lee}
 
 \begin{document}
 
+
 \maketitle
 
-\begin{dfn}[test]{dfn:tester}{}
-    Test
+\begin{dfn}[Example]{dfn:test}{}
+    Example
 \end{dfn}
 
-\begin{lma}[Test]{lma:test}{}
-    Test
+\begin{lma}[Example]{lma:test}{}
+    Example
 \end{lma}
 
-\begin{thm}[Test]{thm:test}{}
-    Test
+\begin{thm}[Example]{thm:test}{}
+    Example
 \end{thm}
 
-\begin{xmp}[Test]{xmp:example}{}
-    Test
+\begin{xmp}[Example]{xmp:example}{}
+    Example
 \end{xmp}
 
-\begin{rem}[Test]{rem:tets}{}
-    Test
+\begin{rem}[Example]{rem:tets}{}
+    Example
 \end{rem}
 
-\begin{qst}[Test]{qst:test}{}
-    Test
+\begin{qst}[Example]{qst:test}{}
+    Example
 \end{qst}
 
+\newpage
 
+\section{Section}
+\subsection{Subsection}
+\begin{dfn}[Automatic Numbering with sections]{dfn:test2}{}
+    Boxes will increase the number of \\subsubsection
+\end{dfn}
+
+\subsubsection{Subsection}
+
+\begin{dfn}[Another box]{dfn:test3}{}
+    
+\end{dfn}
+
+\subsection{Another subsection}
+
+\begin{dfn}[Box on the next subsection]{dfn:test4}{}
+    
+\end{dfn}
+
+\begin{dfn}[Custom numbering]{dfn:test5}{10.1.5}
+    
+\end{dfn}
+
+\begin{dfn}[Custom numbering 2]{dfn:test6}{ABC}
+    The identifier doesn't need to be restricted to numbers
+\end{dfn}
 
 \end{document}
