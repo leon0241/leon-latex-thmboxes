@@ -5,6 +5,8 @@ Theorem boxes are created using `thmboxes_v3.sty`. They are inspired by
 - [Fancy boxes with mdframed](https://texblog.org/2015/09/30/fancy-boxes-for-theorem-lemma-and-proof-with-mdframed/)
 - [Manual Theorem numbering](https://tex.stackexchange.com/questions/391443/new-theorem-environment-with-manual-theorem-number)
 
+**NOTE**: don't use thmboxes_v4, it's WIP and doesn't really work right now
+
 ## Example:
 ![](thmboxes_example.png)
 [Example file](example.tex)
@@ -70,4 +72,4 @@ Creates a new environment `thm` that's blue and says Theorem at the start, which
 Where the options are the same as listed above
 
 ## WIP
-- Hopefully gonna be working on an overhaul using tcolorbox, as there's a bug where using multicols makes it so it makes an empty page break instead of breaking onto the next column, but that probably won't be until exam season
+- Hopefully gonna be working on an overhaul using tcolorbox (thmboxes_v4), as there's a bug where using multicols makes it so it makes an empty page break instead of breaking onto the next column, but that probably won't be until exam season
