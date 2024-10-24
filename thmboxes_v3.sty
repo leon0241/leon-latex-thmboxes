@@ -2,6 +2,8 @@
 % https://texblog.org/2015/09/30/fancy-boxes-for-theorem-lemma-and-proof-with-mdframed/
 % https://tex.stackexchange.com/questions/391443/new-theorem-environment-with-manual-theorem-number
 
+\usepackage[dvipsnames]{xcolor}
+
 % TYPES:
 % thm (theorem) / def (definition) / xmp (examples) / rem (remark)
 
@@ -12,32 +14,42 @@
 
 % THEOREM
 \newenvironment{thm}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{blue}{20}{Theorem}
+    \begin{thmbox}[#1]{thm:#2}{#3}{blue}{20}{Theorem}
 } {\end{thmbox}}
 
-% THEOREM
+% LEMMA
 \newenvironment{lma}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{cyan}{20}{Lemma}
+    \begin{thmbox}[#1]{lma:#2}{#3}{cyan}{20}{Lemma}
+} {\end{thmbox}}
+
+% COROLLARY
+\newenvironment{crl}[3][]{
+    \begin{thmbox}[#1]{crl:#2}{#3}{cyan}{20}{Corollary}
+} {\end{thmbox}}
+
+% PROPOSITION
+\newenvironment{ppn}[3][]{
+    \begin{thmbox}[#1]{ppn:#2}{#3}{cyan}{20}{Prop}
 } {\end{thmbox}}
 
 % DEFINITION
 \newenvironment{dfn}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{green}{20}{Definition}
+    \begin{thmbox}[#1]{thm:#2}{#3}{green}{20}{Definition}
 } {\end{thmbox}}
 
 % EXAMPLE
 \newenvironment{xmp}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{yellow}{40}{Example}
+    \begin{thmbox}[#1]{thm:#2}{#3}{yellow}{40}{Example}
 } {\end{thmbox}}
 
 % REMARK
 \newenvironment{rem}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{magenta}{20}{Remark}
+    \begin{thmbox}[#1]{thm:#2}{#3}{magenta}{20}{Remark}
 } {\end{thmbox}}
 
 % QUESTION
 \newenvironment{qst}[3][]{
-    \begin{thmbox}[#1]{#2}{#3}{orange}{30}{Question}
+    \begin{thmbox}[#1]{thm:#2}{#3}{orange}{30}{Question}
 } {\end{thmbox}}
 
 %---------------------------------%
@@ -57,12 +69,18 @@
         {
             % If argument 3 isn't provided, then use the subsubsection numbering
             \refstepcounter{subsubsection}
-            \newcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+            \ifdefined\thethmbox
+                \renewcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+            \else
+                \newcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+            \fi
         }
         {
-            % Uncomment this to make it increase subsubsection even with a custom box
-            % \refstepcounter{subsubsection}
-            \newcommand{\thethmbox}{#3}
+            \ifdefined\thethmbox
+                \renewcommand{\thethmbox}{#3}
+            \else
+                \newcommand{\thethmbox}{#3}
+            \fi
         }
         % Set up bounding boxes in tikz
         \ifstrempty{#1}%
@@ -88,7 +106,7 @@
             }
 
             % set bounds of box
-            \mdfsetup{innertopmargin=5pt,linecolor=#4!#5,%
+            \mdfsetup{innertopmargin=5pt,linecolor=#4!20,%
                 linewidth=2pt,topline=true,%
                 frametitleaboveskip=\dimexpr-\ht\strutbox\relax
             }
