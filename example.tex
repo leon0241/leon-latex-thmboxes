@@ -65,4 +65,35 @@
     The identifier doesn't need to be restricted to numbers
 \end{dfn}
 
+\newpage
+\subsection{Nesting}
+
+\begin{dfn}[Definition]{dfn:nest}{}
+    Nesting example
+
+    \begin{thm}[Thm inside Definition]{thm:nest2}{}
+        Nesting example 2
+
+        \begin{thm}[again]{thm:nest3}{}
+            ex3
+        \end{thm}
+    \end{thm}
+\end{dfn}
+
+\begin{dfn}[Definition]{dfn:nest4}{A}
+    \begin{thm}[Thm inside definition]{thm:nest5}{Custom Nested}
+        text
+    \end{thm}
+\end{dfn}
+
+
+\begin{dfn}[Definition]{dfn:nest6}{C}
+    \begin{thm}[Thm inside definition]{thm:nest7}{}
+        text
+        \begin{thm}[nested 3]{thm:nest8}{}
+            
+        \end{thm}
+    \end{thm}
+\end{dfn}
+
 \end{document}
