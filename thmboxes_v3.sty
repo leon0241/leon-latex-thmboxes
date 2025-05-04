@@ -13,43 +13,58 @@
 % \end{thm}
 
 % THEOREM
-\newenvironment{thm}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{blue}{20}{Theorem}
+% \newenvironment{thm}[3][]{
+%     \begin{thmbox}[#1]{#2}{#3}{blue}{20}{Theorem}
+% } {\end{thmbox}}
+
+% THEOREM
+\newenvironment{thm-s}[3][]{
+    \begin{thmbox}[#1]{#2}{#3}{blue}{20}{Thm}
 } {\end{thmbox}}
 
 % LEMMA
 \newenvironment{lma}[3][]{
-    \begin{thmbox}[#1]{lma:#2}{#3}{cyan}{20}{Lemma}
+    \begin{thmbox}[#1]{#2}{#3}{cyan}{20}{Lemma}
 } {\end{thmbox}}
 
 % COROLLARY
 \newenvironment{crl}[3][]{
-    \begin{thmbox}[#1]{crl:#2}{#3}{cyan}{20}{Corollary}
+    \begin{thmbox}[#1]{#2}{#3}{cyan}{20}{Corollary}
 } {\end{thmbox}}
 
 % PROPOSITION
 \newenvironment{ppn}[3][]{
-    \begin{thmbox}[#1]{ppn:#2}{#3}{cyan}{20}{Prop}
+    \begin{thmbox}[#1]{#2}{#3}{cyan}{20}{Proposition}
 } {\end{thmbox}}
 
 % DEFINITION
 \newenvironment{dfn}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{green}{20}{Definition}
+    \begin{thmbox}[#1]{#2}{#3}{green}{20}{Definition}
+} {\end{thmbox}}
+
+% DEFINITION
+\newenvironment{dfn-s}[3][]{
+    \begin{thmbox}[#1]{#2}{#3}{green}{20}{Def}
 } {\end{thmbox}}
 
 % EXAMPLE
 \newenvironment{xmp}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{yellow}{40}{Example}
+    \begin{thmbox}[#1]{#2}{#3}{yellow}{40}{Example}
 } {\end{thmbox}}
 
 % REMARK
 \newenvironment{rem}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{magenta}{20}{Remark}
+    \begin{thmbox}[#1]{#2}{#3}{magenta}{20}{Remark}
 } {\end{thmbox}}
 
 % QUESTION
 \newenvironment{qst}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{orange}{30}{Question}
+    \begin{thmbox}[#1]{#2}{#3}{orange}{30}{Question}
+} {\end{thmbox}}
+
+% RECALL
+\newenvironment{rcl}[3][]{
+    \begin{thmbox}[#1]{#2}{#3}{red}{20}{Recall}
 } {\end{thmbox}}
 
 %---------------------------------%
@@ -68,19 +83,18 @@
     \ifstrempty{#3}
         {
             % If argument 3 isn't provided, then use the subsubsection numbering
+            \refstepcounter{subsubsection}
             \ifdefined\thethmbox
-                % \renewcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
-                \renewcommand{\thethmbox}{}
+                \renewcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
             \else
-                \refstepcounter{subsubsection}
-                \newcommand{\thethmbox}{ \arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
+                \newcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
             \fi
         }
         {
             \ifdefined\thethmbox
-                \renewcommand{\thethmbox}{ #3}
+                \renewcommand{\thethmbox}{#3}
             \else
-                \newcommand{\thethmbox}{ #3}
+                \newcommand{\thethmbox}{#3}
             \fi
         }
         % Set up bounding boxes in tikz
@@ -91,7 +105,7 @@
                     frametitle={
                         \tikz[baseline=(current bounding box.east),outer sep=0pt]
                         \node[anchor=east,rectangle,fill=#4!#5]
-                        {\strut #6\thethmbox};
+                        {\strut #6 \thethmbox};
                     }
                 }
             }
@@ -101,7 +115,7 @@
                     frametitle={
                         \tikz[baseline=(current bounding box.east),outer sep=0pt]
                         \node[anchor=east,rectangle,fill=#4!#5]
-                        {\strut #6\thethmbox:~#1};
+                        {\strut #6 \thethmbox:~#1};
                     }
                 }
             }
@@ -112,6 +126,7 @@
                 frametitleaboveskip=\dimexpr-\ht\strutbox\relax
             }
             % start environment with label as argument 2
+            \vspace{-5pt}
             \begin{mdframed}[backgroundcolor=#4!2]\relax\raggedright%
                 \label{#2}
             }

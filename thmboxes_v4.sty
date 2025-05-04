@@ -1,119 +1,382 @@
-%-----------------------------------------------%
-%                                               %
-%     [WIP] Theoremboxes tcolorbox overhaul     %
-%                                               %
-%-----------------------------------------------%
-
-
-
-
 
 % inspired by
 % https://texblog.org/2015/09/30/fancy-boxes-for-theorem-lemma-and-proof-with-mdframed/
 % https://tex.stackexchange.com/questions/391443/new-theorem-environment-with-manual-theorem-number
 
-\usepackage[dvipsnames]{xcolor}
-
-% TYPES:
-% thm (theorem) / def (definition) / xmp (examples) / rem (remark)
-
-% USAGE:
-% \begin{thm}[Name]{Label}{Reference Number}
-    % TEXT
-% \end{thm}
-
-% THEOREM
-\newenvironment{thm}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{blue}{20}{Theorem}
-} {\end{thmbox}}
-
-% THEOREM
-\newenvironment{lma}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{cyan}{20}{Lemma}
-} {\end{thmbox}}
-
-% DEFINITION
-\newenvironment{dfn}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{green}{20}{Definition}
-} {\end{thmbox}}
-
-% EXAMPLE
-\newenvironment{xmp}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{yellow}{40}{Example}
-} {\end{thmbox}}
-
-% REMARK
-\newenvironment{rem}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{magenta}{20}{Remark}
-} {\end{thmbox}}
-
-% QUESTION
-\newenvironment{qst}[3][]{
-    \begin{thmbox}[#1]{thm:#2}{#3}{orange}{30}{Question}
-} {\end{thmbox}}
-
-%---------------------------------%
-%                                 %
-%     THEOREM BOX GENERAL DEF     %
-%                                 %
-%---------------------------------%
-
-% USAGE:
-% \begin{thmbox}[Name]{Label}{Reference Number}{Box Colour}{Box Opacity}{Title Category}
-    % TEXT
-% \end{thmbox}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thmboxes_v4}[2025/05/04 Theorem Boxes]
 
 
-\newtcolorbox{thm-tcol}{}
+% \requirepackage[dvipsnames]{xcolor}
+\RequirePackage{xstring}
+\RequirePackage{tcolorbox}
 
-\newenvironment{thmbox}[6][]{%
-    % Argument 3 is a custom number
-    \ifstrempty{#3}
-        {
-            % If argument 3 isn't provided, then use the subsubsection numbering
-            \refstepcounter{subsubsection}
-            \newcommand{\thethmbox}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}}
-        }
-        {
-            % Uncomment this to make it increase subsubsection even with a custom box
-            % \refstepcounter{subsubsection}
-            \newcommand{\thethmbox}{#3}
-        }
-        % Set up bounding boxes in tikz
-        \ifstrempty{#1}%
-            {
-                % if there is no argument 1 (Title), then just a box
-                % \mdfsetup{
-                %     frametitle={
-                %         \tikz[baseline=(current bounding box.east),outer sep=0pt]
-                %         \node[anchor=east,rectangle,fill=#4!#5]
-                %         {\strut #6 \thethmbox};
-                %     }
-                % }
-                \renewtcolorbox{thm-tcol}{title={\strut #6 \thethmbox}}
+\newcommand{\useseparatenumbers}{0}
+% All types of boxes have a different counter
+\DeclareOption{separate}{}
+% % All types of boxes are on one counter
+% \DeclareOption{thmclass}{\renewcommand{\useseparatenumbers}{1}}
+% All boxes share the subsubsection counter
+\DeclareOption{subsubsection}{}
 
-            }
-            {
-                % if there is argument 1 (Title), then add title
-                % \mdfsetup{
-                %     frametitle={
-                %         \tikz[baseline=(current bounding box.east),outer sep=0pt]
-                %         \node[anchor=east,rectangle,fill=#4!#5]
-                %         {\strut #6 \thethmbox:~#1};
-                %     }
-                % }
-                \renewtcolorbox{thm-tcol}{title={\strut #6 \thethmbox:~#1}}
-            }
 
-            % set bounds of box
-            % \mdfsetup{innertopmargin=5pt,linecolor=#4!20,%
-            %     linewidth=2pt,topline=true,%
-            %     frametitleaboveskip=\dimexpr-\ht\strutbox\relax
-            % }
-            % start environment with label as argument 2
-            % \begin{mdframed}[backgroundcolor=#4!2]\relax\raggedright%
-            %     \label{#2}
-            \begin{thm-tcol}
-            }
-        {\end{thm-tcol}
+% ╭──────────────────────────────────────────────────────────╮
+% │                          STYLE                           │
+% ╰──────────────────────────────────────────────────────────╯
+
+\tcbset{thmboxstyle/.style={
+    % General settings
+        enhanced, % Enhanced Style
+        sharp corners, % Sharp corners (box)
+    % Title box setup
+        coltitle=black, 
+        attach boxed title to top left={ % Position the title box
+            yshift=-12pt, % Shift down the box
+            yshifttext=-8pt, % Offset text
+        xshift=15pt}, % Shift to the right
+        boxed title style={ % Style the title box
+            left=0pt, right=0pt, % No margins on left and right side
+            sharp corners, % Sharp corners (title)
+        },
+    % Title text setup
+        fonttitle=\bfseries,
+    % Frame setup
+        boxrule=2pt, % Width of box frame
+    % Box setup
+        left=7pt,
+        bottom=2pt, % Bottom padding
+    %
+        label is label,
     }
+}
+
+% ╭──────────────────────────────────────────────────────────╮
+% │                       LABEL PARSER                       │
+% ╰──────────────────────────────────────────────────────────╯
+
+% If the numbering is a number, then run
+\newcommand{\parsetext}[3]{
+    % If there is even a dot then do this. else just do nothing
+    % TODO: random gap over here
+    \IfSubStr{#1}{.}{
+        \ifnum #3=3 % Section.Subsection.Theorem
+            % split into section | subsection.theorem
+            \StrCut{#1}{.}\secnum\restnum
+            % split into subsection | theorem
+            \StrCut{\restnum}{.}\ssecnum\thmnum
+            % set section
+            \setcounter{section}{\secnum}
+            % set subsection
+            \setcounter{subsection}{\ssecnum}
+            % set theorem (take 1 because it steps)
+            \setcounter{#2}{\numexpr\thmnum-1\relax}
+        \else % Subsection.Theorem
+            % split into subsection | theorem
+            \StrCut{#1}{.}\secnum\thmnum
+            % set subsection
+            \setcounter{subsection}{\secnum}
+            % set theorem
+            \setcounter{#2}{\numexpr\thmnum-1\relax}
+        \fi
+    }{}
+}
+
+% ╭──────────────────────────────────────────────────────────╮
+% │                   SEPARATE DEFINITIONS                   │
+% ╰──────────────────────────────────────────────────────────╯
+
+% ── THEOREM ───────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{thmcount}\counterwithin{thmcount}{subsection} 
+\newtcolorbox[auto counter, use counter=thmcount, number within=subsection]{thm-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=blue!20, colframe=blue!20, colback=blue!5,
+    title={#5 #4: #2}, % Title Formatting
+    label=#3,               % Label Formatting
+    thmboxstyle={#2},       % Import general style
+    #1,                     % Additional options
+}
+
+\newenvironment{thm}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{thmcount}{3}}
+    \begin{thm-box}{#1}{#2}{\thethmcount}{Theorem}
+} {\end{thm-box}}
+
+\newenvironment{thm-s}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{thmcount}{3}}
+    \begin{thm-box}{#1}{#2}{\thethmcount}{Thm}
+} {\end{thm-box}}
+
+% ── DEFINITION ───────────────────────────────────────────────────────
+
+\newcounter{dfncount}\counterwithin{dfncount}{subsection} 
+% #1: Name, #2: Label, #3: Count
+\newtcolorbox[auto counter, use counter=dfncount, number within=subsection]{dfn-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=green!20, colframe=green!20, colback=green!5,
+    title={#5 #4: #2}, % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+% Definition
+\newenvironment{dfn}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{dfncount}{3}}
+    \begin{dfn-box}{#1}{#2}{\thedfncount}{Definition}
+} {\end{dfn-box}}
+
+% Dfn
+\newenvironment{dfn-s}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{dfncount}{3}}
+    \begin{dfn-box}{#1}{#2}{\thedfncount}{Dfn}
+} {\end{dfn-box}}
+
+% ── EXAMPLE ───────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{xmpcount}\counterwithin{xmpcount}{subsection} 
+\newtcolorbox[auto counter, use counter=xmpcount, number within=subsection]{xmp-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=yellow!20, colframe=yellow!20, colback=yellow!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{xmp}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{xmpcount}{3}}
+    \begin{xmp-box}{#1}{#2}{\thexmpcount}{Example}
+} {\end{xmp-box}}
+
+\newenvironment{xmp-s}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{xmpcount}{3}}
+    \begin{xmp-box}{#1}{#2}{\thexmpcount}{Ex.}
+} {\end{xmp-box}}
+
+
+% ── REMARK ────────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{remcount}\counterwithin{remcount}{subsection} 
+\newtcolorbox[auto counter, use counter=remcount, number within=subsection]{rem-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=magenta!20, colframe=magenta!20, colback=magenta!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{rem}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{remcount}{3}}
+    \begin{rem-box}{#1}{#2}{\theremcount}{Remark}
+} {\end{rem-box}}
+
+
+
+% ── QUESTION ──────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{qstcount}\counterwithin{qstcount}{subsection} 
+\newtcolorbox[auto counter, use counter=qstcount, number within=subsection]{qst-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=orange!20, colframe=orange!20, colback=orange!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{qst}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{qstcount}{3}}
+    \begin{qst-box}{#1}{#2}{\theqstcount}{Question}
+} {\end{qst-box}}
+
+\newenvironment{qst-s}[3][]{
+    % If the last box is empty then run parser
+    \ifstqstpty{#3}{}{\parsetext{#3}{qstcount}{3}}
+    \begin{qst-box}{#1}{#2}{\theqstcount}{Q.}
+} {\end{qst-box}}
+
+
+% ── LEMMA ─────────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{lmacount}\counterwithin{dfncount}{subsection} 
+\newtcolorbox[auto counter, use counter=lmacount, number within=subsection]{lma-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=cyan!20, colframe=cyan!20, colback=cyan!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{lma}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{lmacount}{3}}
+    \begin{lma-box}{#1}{#2}{\thelmacount}{Lemma}
+} {\end{lma-box}}
+
+
+% ── PROPOSITION ───────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{ppncount}\counterwithin{dfncount}{subsection} 
+\newtcolorbox[auto counter, use counter=ppncount, number within=subsection]{ppn-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=cyan!20, colframe=cyan!20, colback=cyan!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{ppn}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{ppncount}{3}}
+    \begin{ppn-box}{#1}{#2}{\theppncount}{Proposition}
+} {\end{ppn-box}}
+
+\newenvironment{ppn-s}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{ppncount}{3}}
+    \begin{ppn-box}{#1}{#2}{\theppncount}{Prop}
+} {\end{ppn-box}}
+
+% ── COROLLARY ─────────────────────────────────────────────────────────
+
+% #1: Name, #2: Label, #3: Count
+\newcounter{crlcount}\counterwithin{dfncount}{subsection} 
+\newtcolorbox[auto counter, use counter=crlcount, number within=subsection]{crl-box}[5][]{
+    % Background , Colour of frame, Colour of Box background
+    colbacktitle=cyan!20, colframe=cyan!20, colback=cyan!5,
+    title={#5 #4: #2},  % Title Formatting
+    label=#3,                   % Label Formatting
+    thmboxstyle={#2},           % Import general style
+    #1,                         % Additional options
+}
+
+\newenvironment{crl}[3][]{
+    % If the last box is empty then run parser
+    \ifstrempty{#3}{}{\parsetext{#3}{crlcount}{3}}
+    \begin{crl-box}{#1}{#2}{\thecrlcount}{Corollary}
+} {\end{crl-box}}
+
+
+% ╭──────────────────────────────────────────────────────────╮
+% │                    COMBINED NUMBERING                    │
+% ╰──────────────────────────────────────────────────────────╯
+
+% ── COMBINED BOX COUNTER ──────────────────────────────────────────────
+
+\DeclareOption{thmclass}{
+    \newcommand{\test}{5}
+    \newcounter{thmboxcount}\counterwithin{thmboxcount}{subsection} 
+    % #1: Name, #2: Label, #3: Count
+    \newtcolorbox[auto counter, use counter=thmboxcount, number within=subsection]{thmbox-box}[7][]{
+        % Background , Colour of frame, Colour of Box background
+        colbacktitle=#6, colframe=#6, colback=#7,
+        title={#5 #4: #2}, % Title Formatting
+        label=#3,                   % Label Formatting
+        thmboxstyle={#2},           % Import general style
+        #1,                         % Additional options
+    }
+    %
+    % Theorem
+    \renewenvironment{thm}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Theorem}{blue!20}{blue!5}
+    } {\end{thmbox-box}}
+    % Thm
+    \renewenvironment{thm-s}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Thm}{blue!20}{blue!5}
+    } {\end{thmbox-box}}
+    % Definition
+    \renewenvironment{dfn}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Definition}{green!20}{green!5}
+    } {\end{thmbox-box}}
+    % Dfn
+    \renewenvironment{dfn-s}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Def}{green!20}{green!5}
+    } {\end{thmbox-box}}
+    % Example
+    \renewenvironment{xmp}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Example}{yellow!20}{yellow!5}
+    } {\end{thmbox-box}}
+    % Ex
+    \renewenvironment{xmp-s}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Ex.}{yellow!20}{yellow!5}
+    } {\end{thmbox-box}}
+    % Remark
+    \renewenvironment{rem}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Remark}{magenta!20}{magenta!5}
+    } {\end{thmbox-box}}
+    % Question
+    \renewenvironment{qst}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Question}{orange!20}{orange!5}
+    } {\end{thmbox-box}}
+    % Q.
+    \renewenvironment{qst-s}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Q.}{orange!20}{orange!5}
+    } {\end{thmbox-box}}
+    % Lemma
+    \renewenvironment{lma}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Lemma}{cyan!20}{cyan!5}
+    } {\end{thmbox-box}}
+    % Proposition
+    \renewenvironment{ppn}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Proposition}{cyan!20}{cyan!5}
+    } {\end{thmbox-box}}
+    % Prop
+    \renewenvironment{ppn-s}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Prop}{cyan!20}{cyan!5}
+    } {\end{thmbox-box}}
+    % Corollary
+    \renewenvironment{crl}[3][]{
+        % If the last box is empty then run parser
+        \ifstrempty{#3}{}{\parsetext{#3}{thmboxcount}{3}}
+        \begin{thmbox-box}{#1}{#2}{\thethmboxcount}{Corollary}{cyan!20}{cyan!5}
+    } {\end{thmbox-box}}
+}
+% ── SUBSUBSECTION COUNTER ─────────────────────────────────────────────
+
+% ── SEPARATE BOX COUNTERS ─────────────────────────────────────────────
+
+
+\DeclareOption*{\PackageWarning{examplepackage}{Unknown ‘\CurrentOption’}}
+\ProcessOptions\relax

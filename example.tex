@@ -1,9 +1,16 @@
 \documentclass[]{article}
 
 \usepackage[framemethod=TikZ]{mdframed}
-\usepackage{thmboxes_v3}
+% \usepackage{thmboxes_v3}
+\usepackage[skins, breakable]{tcolorbox}
+\usepackage{lipsum}
+% \tcbuselibrary{skins,breakable}
+
 \usepackage{lipsum}
 \usepackage{multicol}
+
+\usepackage{xstring}
+\usepackage[thmclass]{thmboxes_v4}
 
 \title{Theorem Boxes}
 \author{Leon Lee}
@@ -13,10 +20,54 @@
 
 \maketitle
 
-\begin{thm}[Example]{thm:test}{}
-    Example
+\useseparatenumbers
+
+\section{test}
+\section{test}
+
+\begin{thm}[Example]{thm:test2}{A}
+    test
 \end{thm}
 
+\begin{thm}[Example]{thm:test3}{B}
+    test
+\end{thm}
+
+\begin{thm}[Example]{thm:test4}{}
+    test
+\end{thm}
+% \begin{thm}[Example]{thm:test2}{}
+%     test
+% \end{thm}
+
+% \begin{thm}[Example]{thm:test3}{}
+%     Example
+%
+%     Text 
+%
+%     Some more text
+% \end{thm}
+%
+% \begin{thm}[Example]{thm:test4}{}
+%     Example
+%
+%     Text 
+%
+%     Some more text
+% \end{thm}
+
+Reference: \ref{thm:test2} aa
+
+Reference: \ref{thm:test3} aa
+
+Reference: \ref{thm:test4} aa
+
+% Reference: \ref{thm:test3} bb
+
+
+\begin{rem}[jkkj]{rem:}{}
+    
+\end{rem}
 \begin{lma}[Example]{lma:test}{}
     Example
 \end{lma}
@@ -48,17 +99,17 @@
 \subsubsection{Subsection}
 
 \begin{dfn}[Another box]{dfn:test3}{}
-    
+
 \end{dfn}
 
 \subsection{Another subsection}
 
 \begin{dfn}[Box on the next subsection]{dfn:test4}{}
-    
+
 \end{dfn}
 
 \begin{dfn}[Custom numbering]{dfn:test5}{10.1.5}
-    
+
 \end{dfn}
 
 \begin{dfn}[Custom numbering 2]{dfn:test6}{ABC}
@@ -81,9 +132,9 @@
 \end{dfn}
 
 \begin{dfn}[Definition]{dfn:nest4}{A}
-    \begin{thm}[Thm inside definition]{thm:nest5}{Custom Nested}
-        text
-    \end{thm}
+    % \begin{thm}[Thm inside definition]{thm:nest5}{Custom Nested}
+    %     text
+    % \end{thm}
 \end{dfn}
 
 
@@ -91,7 +142,7 @@
     \begin{thm}[Thm inside definition]{thm:nest7}{}
         text
         \begin{thm}[nested 3]{thm:nest8}{}
-            
+
         \end{thm}
     \end{thm}
 \end{dfn}
