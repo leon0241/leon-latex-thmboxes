@@ -1,16 +1,27 @@
 \documentclass[]{article}
 
+% Horizontal
+% \documentclass[landscape, 8pt]{extarticle}
+%
+% % Page margins
+% \usepackage{geometry}
+% \geometry{
+% 	a4paper,
+% 	margin=0.17in
+% }
+
+\usepackage{amsthm}
+
 \usepackage[framemethod=TikZ]{mdframed}
 % \usepackage{thmboxes_v3}
 \usepackage[skins, breakable]{tcolorbox}
 \usepackage{lipsum}
 % \tcbuselibrary{skins,breakable}
 
-\usepackage{lipsum}
 \usepackage{multicol}
 
 \usepackage{xstring}
-\usepackage[thmclass]{thmboxes_v4}
+\usepackage[separate]{thmboxes_v4}
 
 \title{Theorem Boxes}
 \author{Leon Lee}
@@ -27,6 +38,12 @@
 
 \begin{thm}[Example]{thm:test2}{A}
     test
+    \tcbline
+    test
+    \tcblower
+    \begin{proof}
+        test
+    \end{proof}
 \end{thm}
 
 \begin{thm}[Example]{thm:test3}{B}
